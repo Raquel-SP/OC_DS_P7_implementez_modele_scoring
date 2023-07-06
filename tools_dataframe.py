@@ -53,6 +53,51 @@ def visu_dataTypes (df):
     plt.show()
 
 
+# ---------------------------------------------------------------------------
+# -- GET MISSING VALUES
+# ---------------------------------------------------------------------------
+
+def get_missing_values(df_work, percentage, show_heatmap, retour=False):
+    """Information about missing values
+       @param in : df_work dataframe obligatoire
+                   percentage : boolean si True shows the number heatmap
+                   show_heatmap : boolean si  shows the number heatmap
+       @param out : none
+    """
+
+    # 1. Total missing values
+    nb_nan_tot = df_work.isna().sum().sum()
+    nb_data_tot = np.product(df_work.shape)
+    pourc_nan_tot = round((nb_nan_tot / nb_data_tot) * 100, 2)
+    print(
+        f'Missing values : {nb_nan_tot} NaN for {nb_data_tot} data ({pourc_nan_tot} %)')
+
+    if percentage:
+        print("-------------------------------------------------------------")
+        print("Number and % of missing values by variable\n")
+        # 2. Visualization of number and percentage of missing values per variable
+        values = df_work.isnull().sum()
+        percentage = 100 * values / len(df_work)
+        table = pd.concat([values, percentage.round(2)], axis=1)
+        table.columns = [
+            'Number of missing values',
+            '% of missing values']
+        display(table[table['Number of missing values'] != 0]
+                .sort_values('% of missing values', ascending=False)
+                .style.background_gradient('seismic'))
+
+    if show_heatmap:
+        print("-------------------------------------------------------------")
+        print("Heatmap of missing values")
+        # 3. Heatmap of missing values
+        plt.figure(figsize=(20, 10))
+        sns.heatmap(df_work.isna(), cbar=False)
+        plt.show()
+
+    if retour:
+        return table
+    
+    
 # --------------------------------------------------------------------
 # -- COLUMN FILLING VISUALIZATION
 # --------------------------------------------------------------------
@@ -97,3 +142,30 @@ def univ_cate_vari(dataframe, feature, tableau=True, graphDistsrib=True):
         plt.title("Distribution of " + feature)
         plt.show()
 
+
+# --------------------------------------------------------------------
+# -- CALCULATE BIN DISTRIBUTION
+# --------------------------------------------------------------------
+
+
+def distribution_variables_plages(
+        dataframe, variable, liste_bins):
+    """
+    Retourne les plages des pourcentages des valeurs pour le découpage transmis
+    Parameters
+    ----------
+    @param IN : dataframe : DataFrame, obligatoire
+                variable : variable à découper obligatoire
+                liste_bins: liste des découpages facultatif int ou pintervallindex
+    @param OUT : dataframe des plages de nan
+    """
+    nb_lignes = len(dataframe[variable])
+    s_gpe_cut = pd.cut(
+        dataframe[variable],
+        bins=liste_bins).value_counts().sort_index()
+    df_cut = pd.DataFrame({'Plage': s_gpe_cut.index,
+                           'nb_données': s_gpe_cut.values})
+    df_cut['%_données'] = [
+        (row * 100) / nb_lignes for row in df_cut['nb_données']]
+
+    return df_cut.style.hide_index()

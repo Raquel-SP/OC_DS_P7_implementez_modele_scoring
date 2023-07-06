@@ -14,6 +14,7 @@
 import pandas as pd
 import numpy as np
 import pickle
+import datetime
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.ensemble import RandomForestClassifier
 import lightgbm as lgb
@@ -23,6 +24,8 @@ import matplotlib.pyplot as plt
 from IPython.display import display
 from sklearn.feature_selection import RFECV
 from pprint import pprint
+from xgboost import XGBRegressor
+
 
 # --------------------------------------------------------------------
 # -- VERSION
@@ -155,4 +158,97 @@ def transl_values_variables(dataframe, list_columns_translate, dictionary):
     for col in list_columns_translate:
         for key, value in dictionary.items():
             dataframe[col] = dataframe[col].replace(key, value)
+
+
+# --------------------------------------------------------------------
+# -- PREDICT MISSING VALUES OF EXT_SOURCE FEATURES
+# --------------------------------------------------------------------
+            
+def ext_source_values_predictor(application_train, application_test):
+    '''
+    Function to predict the missing values of EXT_SOURCE features
         
+    Inputs: application_train, application_test
+        
+    Returns:  None
+    '''
+    file_directory = "../P7_scoring_credit/preprocessing/"
+    
+    start = datetime.datetime.now()
+    print("\nPredicting the missing values of EXT_SOURCE columns...")
+            
+    #predicting the EXT_SOURCE missing values
+    #using only numeric columns for predicting the EXT_SOURCES
+    columns_for_modelling = list(set(application_test.dtypes[application_test.dtypes != 'object'].index.tolist())
+                                 - set(['EXT_SOURCE_1','EXT_SOURCE_2','EXT_SOURCE_3','SK_ID_CURR']))
+    with open(file_directory + 'columns_for_ext_values_predictor.pkl', 'wb') as f:
+        pickle.dump(columns_for_modelling, f)
+  
+        
+    #we'll train an XGB Regression model for predicting missing EXT_SOURCE values
+    #we will predict in the order of least number of missing value columns to max.
+    for ext_col in ['EXT_SOURCE_2','EXT_SOURCE_3','EXT_SOURCE_1']:
+        #X_model - datapoints which do not have missing values of given column
+        #Y_train - values of column trying to predict with non missing values
+        #X_train_missing - datapoints in application_train with missing values
+        #X_test_missing - datapoints in application_test with missing values
+        X_model, X_train_missing, X_test_missing, Y_train = application_train[~application_train[ext_col].isna()][columns_for_modelling],\
+                                                            application_train[application_train[ext_col].isna()][columns_for_modelling],\
+                                                            application_test[application_test[ext_col].isna()][columns_for_modelling],\
+                                                            application_train[ext_col][~application_train[ext_col].isna()]
+        xg = XGBRegressor(n_estimators = 1000, max_depth = 3, learning_rate = 0.1, n_jobs = -1, random_state = 59)
+        xg.fit(X_model, Y_train)
+        #dumping the model to pickle file
+        with open(file_directory + f'nan_{ext_col}_xgbr_model.pkl', 'wb') as f:
+            pickle.dump(xg, f)
+        application_train[ext_col][application_train[ext_col].isna()] = xg.predict(X_train_missing)
+        application_test[ext_col][application_test[ext_col].isna()] = xg.predict(X_test_missing)
+            
+        #adding the predicted column to columns for modelling for next column's prediction
+        columns_for_modelling = columns_for_modelling + [ext_col]
+            
+    print("Done.")
+    print(f"Time elapsed = {datetime.datetime.now() - start}")
+    
+    
+    
+    
+# ---------------------------------------------------------------------------------
+# -- MERGE ALL THE TABLES TOGETHER WITH THE APPLICATION_TRAIN AND APPLICATON_TEST
+# ---------------------------------------------------------------------------------
+
+
+def merge_all_tables(application_train_ML, application_test_ML,
+                     bureau_ML,
+                     previous_application_ML, installments_payments_ML,
+                     POS_CASH_balance_ML, cc_balance_ML):
+    '''
+    Function to merge all the tables together with the application_train_ML and application_test_ML tables
+    on SK_ID_CURR.
+    
+    Inputs:
+        All the previously pre-processed Tables.
+        
+    Returns:
+        Single merged tables, one for training data and one for test data
+    '''
+
+    #merging application_train_ML and application_test_ML with Aggregated bureau table
+    app_train_merged = application_train_ML.merge(bureau_ML, on = 'SK_ID_CURR', how = 'left')
+    app_test_merged = application_test_ML.merge(bureau_ML, on = 'SK_ID_CURR', how = 'left')
+    #merging with aggregated previous_applications
+    app_train_merged = app_train_merged.merge(previous_application_ML, on = 'SK_ID_CURR', how = 'left')
+    app_test_merged = app_test_merged.merge(previous_application_ML, on = 'SK_ID_CURR', how = 'left')
+    #merging with aggregated installments tables
+    app_train_merged = app_train_merged.merge(installments_payments_ML, on = 'SK_ID_CURR', how = 'left')
+    app_test_merged = app_test_merged.merge(installments_payments_ML, on = 'SK_ID_CURR', how = 'left')
+    #merging with aggregated POS_Cash balance table
+    app_train_merged = app_train_merged.merge(POS_CASH_balance_ML, on = 'SK_ID_CURR', how = 'left')
+    app_test_merged = app_test_merged.merge(POS_CASH_balance_ML, on = 'SK_ID_CURR', how = 'left')
+    #merging with aggregated credit card table
+    app_train_merged = app_train_merged.merge(cc_balance_ML, on = 'SK_ID_CURR', how = 'left')
+    app_test_merged = app_test_merged.merge(cc_balance_ML, on = 'SK_ID_CURR', how = 'left')
+
+    return reduce_mem_usage(app_train_merged), reduce_mem_usage(app_test_merged)
+
+
