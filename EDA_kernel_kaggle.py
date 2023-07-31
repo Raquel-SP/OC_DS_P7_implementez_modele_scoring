@@ -4,11 +4,11 @@
      https://medium.com/thecyphy/home-credit-default-risk-part-1-3bfe3c7ddd7a
 """
 
-#! /usr/bin/env python3
+# ! /usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # ====================================================================
-# Fonctions EDA Kernel Kaggle -  projet 7 Openclassrooms
+# Functions EDA Kernel Kaggle -  project 7 Openclassrooms
 # Version : 0.0.0 - Created by RSP 05/2023
 # ====================================================================
 from IPython.core.display import display
@@ -29,7 +29,6 @@ from plotly.subplots import make_subplots
 
 plotly.offline.init_notebook_mode(connected=True)
 
-
 # --------------------------------------------------------------------
 # -- VERSION
 # --------------------------------------------------------------------
@@ -49,25 +48,25 @@ def common_values_dataframes(dataframe, dataframe2, dataframe3, id_cle):
     print('-' * 79)
     print(f'Number of unique values for {id_cle} in {dataframe.name}.csv : {len(dataframe[id_cle].unique())}')
     print(f'Number of unique values for SK_ID_CURR in {dataframe.name}.csv : {len(dataframe.SK_ID_CURR.unique())}')
-    print(f'Number of unique values for SK_ID_CURR in {dataframe2.name}.csv and {dataframe.name}.csv : {len(set(dataframe2.SK_ID_CURR.unique()).intersection(set(dataframe.SK_ID_CURR.unique())))}')
-    print(f'Number of common values for SK_ID_CURR in {dataframe2.name}.csv and {dataframe.name}.csv : {len(set(dataframe3.SK_ID_CURR.unique()).intersection(set(dataframe.SK_ID_CURR.unique())))}')
-    print('-'*79)
+    print(
+        f'Number of unique values for SK_ID_CURR in {dataframe2.name}.csv and {dataframe.name}.csv : {len(set(dataframe2.SK_ID_CURR.unique()).intersection(set(dataframe.SK_ID_CURR.unique())))}')
+    print(
+        f'Number of common values for SK_ID_CURR in {dataframe2.name}.csv and {dataframe.name}.csv : {len(set(dataframe3.SK_ID_CURR.unique()).intersection(set(dataframe.SK_ID_CURR.unique())))}')
+    print('-' * 79)
     duplicate = \
         dataframe.shape[0] - dataframe.duplicated().shape[0]
     print(f'Number of duplicate values in {dataframe.name}.csv : {duplicate}')
     print('-' * 79)
- 
-   
-    
+
+
 # --------------------------------------------------------------------
 # -- PRINT UNIQUE VALUES FOR CATEGORICAL VARIABLES
 # --------------------------------------------------------------------
 
-def print_unique_categories(data, column_name, show_counts = False):
-    
-    '''
+def print_unique_categories(data, column_name, show_counts=False):
+    """
     Function to print the unique values and their counts for categorical variables
-    
+
         Inputs:
         data: DataFrame
             The DataFrame from which to print statistics
@@ -76,26 +75,25 @@ def print_unique_categories(data, column_name, show_counts = False):
         show_counts: bool, default = False
             Whether to show counts of each category or not
 
-    '''
-    
-    print('-'*100)
+    """
+
+    print('-' * 100)
     print(f"The unique categories of '{column_name}' are:\n{data[column_name].unique()}")
-    print('-'*100)
-    
+    print('-' * 100)
+
     if show_counts:
         print(f"Counts of each category are:\n{data[column_name].value_counts()}")
-        print('-'*100)
+        print('-' * 100)
 
 
 # --------------------------------------------------------------------
 # -- PLOT CATEGORICAL VARIABLES PIE PLOTS
 # --------------------------------------------------------------------
 
-def plot_categorical_variables_pie(data, column_name, plot_defaulter = True, hole = 0):
-    
-    '''
+def plot_categorical_variables_pie(data, column_name, plot_defaulter=True, hole=0):
+    """
     Function to plot categorical variables Pie Plots
-    
+
     Inputs:
         data: DataFrame
             The DataFrame from which to plot
@@ -105,49 +103,50 @@ def plot_categorical_variables_pie(data, column_name, plot_defaulter = True, hol
             Whether to plot the Pie Plot for Defaulters or not
         hole: int, default = 0
             Radius of hole to be cut out from Pie Chart
-    '''
-    
+    """
+
     if plot_defaulter:
         cols = 2
-        specs = [[{'type' : 'domain'}, {'type' : 'domain'}]]
-        titles = [f'Distribution of {column_name} for all Targets', f'Percentage of Defaulters for each category of {column_name}']
+        specs = [[{'type': 'domain'}, {'type': 'domain'}]]
+        titles = [f'Distribution of {column_name} for all Targets',
+                  f'Percentage of Defaulters for each category of {column_name}']
     else:
         cols = 1
         specs = [[{'type': 'domain'}]]
         titles = [f'Distribution of {column_name} for all Targets']
-        
+
     values_categorical = data[column_name].value_counts()
     labels_categorical = values_categorical.index
-    
-    fig = make_subplots(rows = 1, cols = cols, 
-                       specs = specs, 
-                       subplot_titles = titles)
-    
-    fig.add_trace(go.Pie(values = values_categorical, labels = labels_categorical, hole = hole, 
-                         textinfo = 'label+percent', textposition = 'inside'), row = 1, col = 1)
-    
-    if plot_defaulter:
-        percentage_defaulter_per_category = data[column_name][data.TARGET == 1].value_counts() * 100 / data[column_name].value_counts()
-        percentage_defaulter_per_category.dropna(inplace = True)
-        percentage_defaulter_per_category = percentage_defaulter_per_category.round(2)
-        
-        fig.add_trace(go.Pie(values = percentage_defaulter_per_category, labels = percentage_defaulter_per_category.index, 
-                             hole = hole, textinfo = 'label+value', hoverinfo = 'label+value'), row = 1, col = 2)
-        
-    fig.update_layout(title = f'Distribution of {column_name}')
-    fig.show()
 
+    fig = make_subplots(rows=1, cols=cols,
+                        specs=specs,
+                        subplot_titles=titles)
+
+    fig.add_trace(go.Pie(values=values_categorical, labels=labels_categorical, hole=hole,
+                         textinfo='label+percent', textposition='inside'), row=1, col=1)
+
+    if plot_defaulter:
+        percentage_defaulter_per_category = data[column_name][data.TARGET == 1].value_counts() * 100 / data[
+            column_name].value_counts()
+        percentage_defaulter_per_category.dropna(inplace=True)
+        percentage_defaulter_per_category = percentage_defaulter_per_category.round(2)
+
+        fig.add_trace(go.Pie(values=percentage_defaulter_per_category, labels=percentage_defaulter_per_category.index,
+                             hole=hole, textinfo='label+value', hoverinfo='label+value'), row=1, col=2)
+
+    fig.update_layout(title=f'Distribution of {column_name}')
+    fig.show()
 
 
 # --------------------------------------------------------------------
 # -- PLOT CATEGORICAL VARIABLES BAR PLOTS
 # --------------------------------------------------------------------
 
-def plot_categorical_variables_bar(data, column_name, figsize = (18,6), percentage_display = True, plot_defaulter = True, rotation = 0, horizontal_adjust = 0, fontsize_percent = 'xx-small'):
-    
-    '''
+def plot_categorical_variables_bar(data, column_name, figsize=(18, 6), percentage_display=True, plot_defaulter=True,
+                                   rotation=0, horizontal_adjust=0, fontsize_percent='xx-small'):
+    """
     Function to plot Categorical Variables Bar Plots
-    
+
     Inputs:
         data: DataFrame
             The DataFrame from which to plot
@@ -165,39 +164,41 @@ def plot_categorical_variables_bar(data, column_name, figsize = (18,6), percenta
             Horizontal adjustment parameter for percentages displayed on the top of Bars of Bar-Plot
         fontsize_percent: str, default = 'xx-small'
             Fontsize for percentage Display
-        
-    '''
-    
+
+    """
+
     print(f"Total Number of unique categories of {column_name} = {len(data[column_name].unique())}")
-    
-    plt.figure(figsize = figsize, tight_layout = False)
-    sns.set(style = 'whitegrid', font_scale = 1.2)
-    
-    #plotting overall distribution of category
-    plt.subplot(1,2,1)
-    data_to_plot = data[column_name].value_counts().sort_values(ascending = False)
-    ax = sns.barplot(x = data_to_plot.index, y = data_to_plot, palette = 'Set1')
-    
+
+    plt.figure(figsize=figsize, tight_layout=False)
+    sns.set(style='whitegrid', font_scale=1.2)
+
+    # plotting overall distribution of category
+    plt.subplot(1, 2, 1)
+    data_to_plot = data[column_name].value_counts().sort_values(ascending=False)
+    ax = sns.barplot(x=data_to_plot.index, y=data_to_plot, palette='Set1')
+
     if percentage_display:
         total_datapoints = len(data[column_name].dropna())
         for p in ax.patches:
-            ax.text(p.get_x() + horizontal_adjust, p.get_height() + 0.005 * total_datapoints, '{:1.02f}%'.format(p.get_height() * 100 / total_datapoints), fontsize = fontsize_percent)
-        
-    plt.xlabel(column_name, labelpad = 10)
-    plt.title(f'Distribution of {column_name}', pad = 20)
-    plt.xticks(rotation = rotation)
-    plt.ylabel('Counts')
-    
-    #plotting distribution of category for Defaulters
-    if plot_defaulter:
-        percentage_defaulter_per_category = (data[column_name][data.TARGET == 1].value_counts() * 100 / data[column_name].value_counts()).dropna().sort_values(ascending = False)
+            ax.text(p.get_x() + horizontal_adjust, p.get_height() + 0.005 * total_datapoints,
+                    '{:1.02f}%'.format(p.get_height() * 100 / total_datapoints), fontsize=fontsize_percent)
 
-        plt.subplot(1,2,2)
-        sns.barplot(x = percentage_defaulter_per_category.index, y = percentage_defaulter_per_category, palette = 'Set2')
+    plt.xlabel(column_name, labelpad=10)
+    plt.title(f'Distribution of {column_name}', pad=20)
+    plt.xticks(rotation=rotation)
+    plt.ylabel('Counts')
+
+    # plotting distribution of category for Defaulters
+    if plot_defaulter:
+        percentage_defaulter_per_category = (data[column_name][data.TARGET == 1].value_counts() * 100 / data[
+            column_name].value_counts()).dropna().sort_values(ascending=False)
+
+        plt.subplot(1, 2, 2)
+        sns.barplot(x=percentage_defaulter_per_category.index, y=percentage_defaulter_per_category, palette='Set2')
         plt.ylabel('Percentage of Defaulter per category')
-        plt.xlabel(column_name, labelpad = 10)
-        plt.xticks(rotation = rotation)
-        plt.title(f'Percentage of Defaulters for each category of {column_name}', pad = 20)
+        plt.xlabel(column_name, labelpad=10)
+        plt.xticks(rotation=rotation)
+        plt.title(f'Percentage of Defaulters for each category of {column_name}', pad=20)
     plt.show()
 
 
@@ -205,12 +206,11 @@ def plot_categorical_variables_bar(data, column_name, figsize = (18,6), percenta
 # -- PLOT CONTINUOUS VARIABLES DISTRIBUTION
 # --------------------------------------------------------------------
 
-def plot_continuous_variables(data, column_name, plots = ['displot', 'CDF', 'box', 'violin'],
-                              scale_limits = None, figsize = (20,8), histogram = True, log_scale = False):
-    
-    '''
+def plot_continuous_variables(data, column_name, plots=['displot', 'CDF', 'box', 'violin'],
+                              scale_limits=None, figsize=(20, 8), histogram=True, log_scale=False):
+    """
     Function to plot continuous variables distribution
-    
+
     Inputs:
         data: DataFrame
             The DataFrame from which to plot.
@@ -226,44 +226,51 @@ def plot_continuous_variables(data, column_name, plots = ['displot', 'CDF', 'box
             Whether to plot histogram along with displot or not.
         log_scale: bool, default = False
             Whether to use log-scale for variables with outlying points.
-    '''
+    """
 
     data_to_plot = data.copy()
     if scale_limits:
-        #taking only the data within the specified limits
-        data_to_plot[column_name] = data[column_name][(data[column_name] > scale_limits[0]) & (data[column_name] < scale_limits[1])]
+        # taking only the data within the specified limits
+        data_to_plot[column_name] = data[column_name][
+            (data[column_name] > scale_limits[0]) & (data[column_name] < scale_limits[1])]
 
     number_of_subplots = len(plots)
-    plt.figure(figsize = figsize)
+    plt.figure(figsize=figsize)
     sns.set_style('whitegrid')
-    
+
     for i, ele in enumerate(plots):
         plt.subplot(1, number_of_subplots, i + 1)
         plt.subplots_adjust(wspace=0.25)
-        
+
         if ele == 'CDF':
-            #making the percentile DataFrame for both positive and negative Class Labels
-            percentile_values_0 = data_to_plot[data_to_plot.TARGET == 0][[column_name]].dropna().sort_values(by = column_name)
-            percentile_values_0['Percentile'] = [ele / (len(percentile_values_0)-1) for ele in range(len(percentile_values_0))]
-            
-            percentile_values_1 = data_to_plot[data_to_plot.TARGET == 1][[column_name]].dropna().sort_values(by = column_name)
-            percentile_values_1['Percentile'] = [ele / (len(percentile_values_1)-1) for ele in range(len(percentile_values_1))]
-            
-            plt.plot(percentile_values_0[column_name], percentile_values_0['Percentile'], color = 'red', label = 'Non-Defaulters')
-            plt.plot(percentile_values_1[column_name], percentile_values_1['Percentile'], color = 'black', label = 'Defaulters')
+            # making the percentile DataFrame for both positive and negative Class Labels
+            percentile_values_0 = data_to_plot[data_to_plot.TARGET == 0][[column_name]].dropna().sort_values(
+                by=column_name)
+            percentile_values_0['Percentile'] = [ele / (len(percentile_values_0) - 1) for ele in
+                                                 range(len(percentile_values_0))]
+
+            percentile_values_1 = data_to_plot[data_to_plot.TARGET == 1][[column_name]].dropna().sort_values(
+                by=column_name)
+            percentile_values_1['Percentile'] = [ele / (len(percentile_values_1) - 1) for ele in
+                                                 range(len(percentile_values_1))]
+
+            plt.plot(percentile_values_0[column_name], percentile_values_0['Percentile'], color='red',
+                     label='Non-Defaulters')
+            plt.plot(percentile_values_1[column_name], percentile_values_1['Percentile'], color='black',
+                     label='Defaulters')
             plt.xlabel(column_name)
             plt.ylabel('Probability')
             plt.title('CDF of {}'.format(column_name))
-            plt.legend(fontsize = 'medium')
+            plt.legend(fontsize='medium')
             if log_scale:
                 plt.xscale('log')
                 plt.xlabel(column_name + ' - (log-scale)')
-            
-        if ele == 'distplot':  
+
+        if ele == 'distplot':
             sns.distplot(data_to_plot[column_name][data['TARGET'] == 0].dropna(),
-                         label='Non-Defaulters', hist = False, color='red')
+                         label='Non-Defaulters', hist=False, color='red')
             sns.distplot(data_to_plot[column_name][data['TARGET'] == 1].dropna(),
-                         label='Defaulters', hist = False, color='black')
+                         label='Defaulters', hist=False, color='black')
             plt.xlabel(column_name)
             plt.ylabel('Probability Density')
             plt.legend(fontsize='medium')
@@ -272,14 +279,14 @@ def plot_continuous_variables(data, column_name, plots = ['displot', 'CDF', 'box
                 plt.xscale('log')
                 plt.xlabel(f'{column_name} (log scale)')
 
-        if ele == 'violin':  
+        if ele == 'violin':
             sns.violinplot(x='TARGET', y=column_name, data=data_to_plot)
             plt.title("Violin-Plot of {}".format(column_name))
             if log_scale:
                 plt.yscale('log')
                 plt.ylabel(f'{column_name} (log Scale)')
 
-        if ele == 'box':  
+        if ele == 'box':
             sns.boxplot(x='TARGET', y=column_name, data=data_to_plot)
             plt.title("Box-Plot of {}".format(column_name))
             if log_scale:
@@ -288,16 +295,15 @@ def plot_continuous_variables(data, column_name, plots = ['displot', 'CDF', 'box
 
     plt.show()
 
-    
+
 # --------------------------------------------------------------------
 # -- PRINT PERCENTILE VALUES
 # --------------------------------------------------------------------
 
-def print_percentiles(data, column_name, percentiles = None):
-    
-    '''
+def print_percentiles(data, column_name, percentiles=None):
+    """
     Function to print percentile values for given column
-    
+
     Inputs:
         data: DataFrame
             The DataFrame from which to print percentiles
@@ -305,16 +311,16 @@ def print_percentiles(data, column_name, percentiles = None):
             Column's name whose percentiles are to be printed
         percentiles: list, default = None
             The list of percentiles to print, if not given, default are printed
-    '''
-    
-    print('-'*100)
+    """
+
+    print('-' * 100)
     if not percentiles:
-        percentiles = list(range(0,80,25)) + list(range(90,101,2))
+        percentiles = list(range(0, 80, 25)) + list(range(90, 101, 2))
     for i in percentiles:
         print(f'The {i}th percentile value of {column_name} is {np.percentile(data[column_name].dropna(), i)}')
-    print("-"*100)
-    
-    
+    print("-" * 100)
+
+
 # --------------------------------------------------------------------
 # -- HEATMAP OF THE VALUES OF Phi-K CORRELATION COEFFICIENT
 # --------------------------------------------------------------------
@@ -323,13 +329,13 @@ def plot_phik_matrix(data, categorical_columns, figsize=(20, 20),
                      mask_upper=True, tight_layout=True, linewidth=0.1,
                      fontsize=10, cmap='Blues', show_target_top_corr=True,
                      target_top_columns=10):
-    '''
+    """
     Function to Phi_k matrix for categorical features
-    We will draw a heat map of the values of the Phi-K correlation coefficient 
+    We will draw a heat map of the values of the Phi-K correlation coefficient
     between the 2 variables.
-    
-    The Phi-K coefficient is similar to the correlation coefficient except that 
-    it can be used with a pair of categorical variables to check whether one variable 
+
+    The Phi-K coefficient is similar to the correlation coefficient except that
+    it can be used with a pair of categorical variables to check whether one variable
     shows some sort of association with the other categorical variable. Its maximum
     value can be 1, indicating a maximum association between two categorical variables.
     Inputs:
@@ -353,7 +359,7 @@ def plot_phik_matrix(data, categorical_columns, figsize=(20, 20),
             Whether to show top/highly correlated features with Target.
         target_top_columns: int, default = 10
             The number of top correlated features with target to display
-    '''
+    """
     # first fetching only the categorical features
     data_for_phik = data[categorical_columns].astype('object')
     phik_matrix = data_for_phik.phik_matrix()
@@ -376,9 +382,9 @@ def plot_phik_matrix(data, categorical_columns, figsize=(20, 20),
     plt.xticks(rotation=90, fontsize=fontsize)
     plt.yticks(rotation=0, fontsize=fontsize)
     plt.title("Phi-K Correlation Heatmap of categorical variables",
-              fontsize=fontsize+4)
+              fontsize=fontsize + 4)
     plt.show()
-    
+
     print("-" * 79)
 
     if show_target_top_corr:
@@ -397,27 +403,25 @@ def plot_phik_matrix(data, categorical_columns, figsize=(20, 20),
 # -----------------------------------------------
 
 class correlation_matrix:
-    '''
+    """
     Class to plot heatmap of Correlation Matrix and print Top Correlated Features with Target.
     Contains three methods:
         1. init method
         2. plot_correlation_matrix method
         3. target_top_corr method
-    '''
+    """
 
     def __init__(
             self,
             data,
             columns_to_drop,
-            figsize=(
-                25,
-                23),
+            figsize=(25, 23),
             mask_upper=True,
             tight_layout=True,
             linewidth=0.1,
             fontsize=10,
             cmap='Blues'):
-        '''
+        """
         Function to initialize the class members.
 
         Inputs:
@@ -440,10 +444,13 @@ class correlation_matrix:
 
         Returns:
             None
-        '''
+        """
 
         self.data = data
-        self.columns_to_drop = columns_to_drop
+        # self.columns_to_drop = columns_to_drop
+        to_drop = columns_to_drop + ['TARGET']
+        self.to_drop = to_drop
+        self.corr_data = self.data.drop(self.to_drop, axis=1).corr()
         self.figsize = figsize
         self.mask_upper = mask_upper
         self.tight_layout = tight_layout
@@ -452,7 +459,7 @@ class correlation_matrix:
         self.cmap = cmap
 
     def plot_correlation_matrix(self):
-        '''
+        """
         Function to plot the Correlation Matrix Heatmap
 
         Inputs:
@@ -460,12 +467,10 @@ class correlation_matrix:
 
         Returns:
             None
-        '''
+        """
 
         # print('-' * 79)
         # building the correlation dataframe
-        self.corr_data = self.data.drop(
-            self.columns_to_drop + ['TARGET'], axis=1).corr()
 
         if self.mask_upper:
             # masking the heatmap to show only lower triangle. This is to save
@@ -489,7 +494,7 @@ class correlation_matrix:
         # print("-" * 100)
 
     def target_top_corr(self, target_top_columns=10):
-        '''
+        """
         Function to return the Top Correlated features with the Target
 
         Inputs:
@@ -499,7 +504,7 @@ class correlation_matrix:
 
         Returns:
             Top correlated features DataFrame.
-        '''
+        """
 
         phik_target_arr = np.zeros(self.corr_data.shape[1])
         # calculating the Phik-Correlation with Target
@@ -515,13 +520,12 @@ class correlation_matrix:
         return top_corr_target_df.iloc[:target_top_columns]
 
 
-
 # ===========================================================================
 # == PARTIE FEATURES SELECTION
 # ===========================================================================
 
 
-def plot_feature_importances(df, threshold = 0.9):
+def plot_feature_importances(df, threshold=0.9):
     """
     Plots 15 most important features and the cumulative importance of features.
     Prints the number of features needed to reach threshold cumulative importance.
@@ -539,46 +543,49 @@ def plot_feature_importances(df, threshold = 0.9):
         Dataframe ordered by feature importances with a normalized column (sums to 1)
         and a cumulative importance column    
     """
-    
+
     plt.rcParams['font.size'] = 18
-    
+
     # Sort features according to importance
-    df = df.sort_values('importance', ascending = False).reset_index()
-    
+    df = df.sort_values('importance', ascending=False).reset_index()
+
     # Normalize the feature importances to add up to one
     df['importance_normalized'] = df['importance'] / df['importance'].sum()
     df['cumulative_importance'] = np.cumsum(df['importance_normalized'])
 
     # Make a horizontal bar chart of feature importances
-    plt.figure(figsize = (10, 12))
+    plt.figure(figsize=(10, 12))
     ax = plt.subplot()
-    
+
     # Need to reverse the index to plot most important on top
-    ax.barh(list(reversed(list(df.index[:30]))), 
-            df['importance_normalized'].head(30), 
-            align = 'center', edgecolor = 'k')
-    
+    ax.barh(list(reversed(list(df.index[:30]))),
+            df['importance_normalized'].head(30),
+            align='center', edgecolor='k')
+
     # Set the yticks and labels
     ax.set_yticks(list(reversed(list(df.index[:30]))))
     ax.set_yticklabels(df['feature'].head(30))
-    
+
     # Plot labeling
-    plt.xlabel('Importance normalisée'); plt.title('Features Importances')
+    plt.xlabel('Importance normalisée');
+    plt.title('Features Importances')
     plt.show()
-    
+
     # Cumulative importance plot
-    plt.figure(figsize = (8, 6))
+    plt.figure(figsize=(8, 6))
     plt.plot(list(range(len(df))), df['cumulative_importance'], 'r-')
-    plt.xlabel('Nombre de variables'); plt.ylabel('Cumulative Importance'); 
+    plt.xlabel('Nombre de variables');
+    plt.ylabel('Cumulative Importance');
     plt.title('Cumulative Feature Importance');
     plt.show();
-    
+
     importance_index = np.min(np.where(df['cumulative_importance'] > threshold))
     print('%d variables nécessaires pour %0.2f de cumulative importance' % (importance_index + 1, threshold))
-    
+
     return df
 
-def identify_zero_importance_features(train, train_labels, iterations = 2):
+
+def identify_zero_importance_features(train, train_labels, iterations=2):
     """
     Identify zero importance features in a training dataset based on the 
     feature importances from a gradient boosting model. 
@@ -594,30 +601,31 @@ def identify_zero_importance_features(train, train_labels, iterations = 2):
     iterations : integer, default = 2
         Number of cross validation splits to use for determining feature importances
     """
-    
+
     # Initialize an empty array to hold feature importances
     feature_importances = np.zeros(train.shape[1])
 
     # Create the model with several hyperparameters
-    model = lgb.LGBMClassifier(objective='binary', boosting_type = 'goss', n_estimators = 10000, class_weight = 'balanced')
-    
+    model = lgb.LGBMClassifier(objective='binary', boosting_type='goss', n_estimators=10000, class_weight='balanced')
+
     # Fit the model multiple times to avoid overfitting
     for i in range(iterations):
-
         # Split into training and validation set
-        train_features, valid_features, train_y, valid_y = train_test_split(train, train_labels, test_size = 0.25, random_state = i)
+        train_features, valid_features, train_y, valid_y = train_test_split(train, train_labels, test_size=0.25,
+                                                                            random_state=i)
 
         # Train using early stopping
-        model.fit(train_features, train_y, early_stopping_rounds=100, eval_set = [(valid_features, valid_y)], 
-                  eval_metric = 'auc', verbose = 200)
+        model.fit(train_features, train_y, early_stopping_rounds=100, eval_set=[(valid_features, valid_y)],
+                  eval_metric='auc', verbose=200)
 
         # Record the feature importances
         feature_importances += model.feature_importances_ / iterations
-    
-    feature_importances = pd.DataFrame({'feature': list(train.columns), 'importance': feature_importances}).sort_values('importance', ascending = False)
-    
+
+    feature_importances = pd.DataFrame({'feature': list(train.columns), 'importance': feature_importances}).sort_values(
+        'importance', ascending=False)
+
     # Find the features with zero importance
     zero_features = list(feature_importances[feature_importances['importance'] == 0.0]['feature'])
     print('\nThere are %d features with 0.0 importance' % len(zero_features))
-    
+
     return zero_features, feature_importances
