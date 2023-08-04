@@ -5,6 +5,7 @@ import flask
 from flask import jsonify
 import pickle
 import pandas as pd
+import numpy as np
 import shap
 import os
 
@@ -31,40 +32,103 @@ def home():
 
 
 # getting our trained model from a file we created earlier
-model = pickle.load(open(path + "/lgbm_best_model.pkl", "rb"))
-# getting the data
-X_dashboard = pd.read_csv(path + "/data_dashboard.csv")
-X_model = pd.read_csv(path + "/data_api_scaled.csv")
+model = pickle.load(open(path + "/model_tests/lgbm_best_model.pkl", "rb"))
+
+#------------------#
+# getting the data #
+#------------------#
+# Data for credit score computing
+X_val = pd.read_csv(path + "/model_tests/X_val.csv")
+y_val = pd.read_csv(path + "/model_tests/y_val.csv")
+
+# Create a subsample
+target = y_val["TARGET"]
+data_copmute = pd.concat((X_val, target), axis=1)
+X_val_0 = data_copmute[data_copmute["TARGET"] == 0].sample(100, random_state=84)
+X_val_1 = data_copmute[data_copmute["TARGET"] == 1].sample(100, random_state=84)
+X_val_sub = pd.concat([X_val_0, X_val_1]).reset_index(drop=True)
+X_val_sub = X_val_sub.drop(columns=["TARGET"])
+
+columns_val = X_val_sub.columns.tolist()
+clients_val = X_val_sub['SK_ID_CURR'].tolist() # Get the list of clients in X_val
+
+#Data post-feature engineering before standardisation
+final_train_data = pickle.load(open(path + "/preprocessing/final_train_data.pkl", "rb"))
+    
+# Get information for clients in X_val
+train_data_modeling_val = final_train_data[final_train_data["SK_ID_CURR"].isin(clients_val)]
+# Reduce information to features used for modeling
+train_data_modeling_val = train_data_modeling_val[columns_val]
+
+# Get original application_train dataset for extract general information
+application_train = pd.read_csv(path + "/model_tests/application_train.csv")
+
+# Get information for clients in X_val
+application_train_val = application_train[application_train["SK_ID_CURR"].isin(clients_val)]
+# General client information
+client_info_columns = ['SK_ID_CURR',
+                       'DAYS_BIRTH', 'CODE_GENDER',
+                       'NAME_FAMILY_STATUS',
+                       'CNT_CHILDREN', 'NAME_EDUCATION_TYPE',
+                       'NAME_INCOME_TYPE', 'DAYS_EMPLOYED',
+                       'AMT_INCOME_TOTAL',
+                       'NAME_CONTRACT_TYPE',
+                        'AMT_GOODS_PRICE',
+                       'NAME_HOUSING_TYPE',]
+general_info = application_train_val[client_info_columns]
+# Change age features to years (instead of days)
+# Transform DAYS_BIRTH to years
+general_info['AGE'] = np.trunc(np.abs(general_info['DAYS_BIRTH']  / 365)).astype('int8')
+# Transform DAYS_EMPLOYED to years
+general_info['YEARS_WORKING'] = np.trunc(np.abs(general_info['DAYS_EMPLOYED'] / 365)).astype('int8')
+# Transform gender : 0 = Féminin et 1 = Masculin
+general_info['GENDER'] = ['Woman' if row == 0 else 'Man' for row in general_info['CODE_GENDER']]
+
+general_info = general_info.drop(columns=['DAYS_BIRTH', 'DAYS_EMPLOYED', 'CODE_GENDER'])
+
+# Combine general information comming from app_train dataset
+# with information used for modeling after feature engineering
+dashboard_dataset = train_data_modeling_val.merge(general_info, on='SK_ID_CURR', how='left')
 
 
-# defining a route to get all clients data
-@app.route("/data", methods=["GET"])
-def get_data():
-    df_all = X_dashboard.to_dict("list")
+# defining a route to get clients data used for prediction
+@app.route("/dataAPI", methods=["GET"])
+def get_apidata():
+    df_all = X_val_sub.to_dict("list")
+    return jsonify(df_all)
+
+# defining a route to get non scaled and general data
+@app.route("/dataGeneral", methods=["GET"])
+def get_Dashboarddata():
+    df_all = dashboard_dataset.to_dict("list")
     return jsonify(df_all)
 
 
 # defining a route to get clients data and prediction
-@app.route("/data/client/<client_id>", methods=["GET"])
+@app.route("/dataAPI/client/<client_id>", methods=["GET"])
 def client_data(client_id):
     # filter the data thanks to the id from the request
-    client_modeliced = X_model[X_model["SK_ID_CURR"] == int(client_id)]
+    client_modeliced = X_val_sub[X_val_sub["SK_ID_CURR"] == int(client_id)]
     client_to_modelice = client_modeliced.drop(columns="SK_ID_CURR")
-
-    # calculate prediction and probability for this client
-    client_modeliced["prediction"] = model.predict(client_to_modelice).tolist()[0]
-    client_modeliced['proba_1'] = model.predict_proba(client_to_modelice)[:, 1]\
-        .tolist()[0]
+        
+    # Client credit Score
+    client_modeliced['proba']=(model.predict_proba(client_to_modelice)[:,1])*100
+    client_modeliced['credit_score']=round(client_modeliced['proba'], 2)
+    
+    # Whether the credit is denied or not
+    opti_proba_threshold = 0.65 # Probability threshold optimised during modeling
+    client_modeliced['prediction'] = np.where(client_modeliced['credit_score']>=(opti_proba_threshold*100), 'Credit denied', 'Credit approuved')
 
     # calculate features importance in this prediction
-    explainer = shap.KernelExplainer(model.predict_proba, client_to_modelice)
+    X_val_sub_shap = X_val_sub.drop(columns="SK_ID_CURR")
+    explainer = shap.KernelExplainer(model.predict_proba, X_val_sub_shap)
 
-    shap_values = explainer.shap_values(client_to_modelice, check_additivity=False)
+    shap_values = explainer.shap_values(client_to_modelice)
 
     # add the shap values in the dataframe
     client_modeliced["expected"] = explainer.expected_value[1]
     new_line = [99999] + list(shap_values[1])[0].tolist()\
-        + [0, 0, explainer.expected_value[1]]
+        + [0, 0, 0, explainer.expected_value[1]]
     client_modeliced.loc[1] = new_line
 
     # create the dictionary to be sent
