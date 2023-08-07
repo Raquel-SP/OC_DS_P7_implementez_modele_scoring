@@ -29,5 +29,8 @@ jobs:
           pip install pandas
           pip install numpy
 
+      - name : Install personal modules
+        run : python -c "import OC_DS_P7_01_modeling/tools_dataframe.py"
+
       - name: Run tests
         run: pytest
