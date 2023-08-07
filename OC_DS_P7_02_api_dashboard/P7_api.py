@@ -32,14 +32,14 @@ def home():
 
 
 # getting our trained model from a file we created earlier
-model = pickle.load(open(path + "/model_tests/lgbm_best_model.pkl", "rb"))
+model = pickle.load(open(path + "/lgbm_best_model.pkl", "rb"))
 
 #------------------#
 # getting the data #
 #------------------#
 # Data for credit score computing
-X_val = pd.read_csv(path + "/model_tests/X_val.csv")
-y_val = pd.read_csv(path + "/model_tests/y_val.csv")
+X_val = pd.read_csv(path + "/X_val.csv")
+y_val = pd.read_csv(path + "/y_val.csv")
 
 # Create a subsample
 target = y_val["TARGET"]
@@ -53,7 +53,7 @@ columns_val = X_val_sub.columns.tolist()
 clients_val = X_val_sub['SK_ID_CURR'].tolist() # Get the list of clients in X_val
 
 #Data post-feature engineering before standardisation
-final_train_data = pickle.load(open(path + "/preprocessing/final_train_data.pkl", "rb"))
+final_train_data = pickle.load(open(path + "/final_train_data.pkl", "rb"))
     
 # Get information for clients in X_val
 train_data_modeling_val = final_train_data[final_train_data["SK_ID_CURR"].isin(clients_val)]
@@ -61,7 +61,7 @@ train_data_modeling_val = final_train_data[final_train_data["SK_ID_CURR"].isin(c
 train_data_modeling_val = train_data_modeling_val[columns_val]
 
 # Get original application_train dataset for extract general information
-application_train = pd.read_csv(path + "/model_tests/application_train.csv")
+application_train = pd.read_csv(path + "/application_train.csv")
 
 # Get information for clients in X_val
 application_train_val = application_train[application_train["SK_ID_CURR"].isin(clients_val)]
