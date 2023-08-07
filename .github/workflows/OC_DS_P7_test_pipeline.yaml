@@ -28,6 +28,7 @@ jobs:
           pip install pytest
           pip install pandas
           pip install numpy
+          pip install imbalanced-learn
 
       - name: Run tests
         run: pytest
