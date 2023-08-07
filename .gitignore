@@ -1,0 +1,16 @@
+.ipynb_checkpoints/
+__pycache__/
+.idea/
+
+mlruns/
+model_tests/
+preprocessing/
+dashboard/
+
+OC_DS_P7_02_api_dashboard/.ipynb_checkpoints/
+OC_DS_P7_03_test_unitaire/.ipynb_checkpoints/
+OC_DS_P7_02_api_dashboard/application_train.csv
+OC_DS_P7_02_api_dashboard/final_train_data.pkl
+OC_DS_P7_02_api_dashboard/X_val.csv
+OC_DS_P7_02_api_dashboard/y_val.csv
+Untitled.ipynb
