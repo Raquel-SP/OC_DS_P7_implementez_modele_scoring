@@ -2,7 +2,6 @@
     variable description, column renaming, etc.
 """
 
-#! /usr/bin/env python3
 # coding: utf-8
 
 # ====================================================================
@@ -13,8 +12,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 from IPython.display import display
-import re
-import os
 
 # --------------------------------------------------------------------
 # -- VERSION
@@ -28,20 +25,21 @@ __version__ = '0.0.0'
 def complet_description(df):
     nb_row = df.index.size
     nb_col = df.columns.size
-    Types = pd.DataFrame(df.dtypes).T.rename(index={0:'Type'}) 
-    Null = pd.DataFrame(df.isna().sum()).T.rename(index={0:'null'})
-    Duplicated = pd.DataFrame(df.shape[0]-df.isna().sum()-df.nunique()).T.rename(index={0:'Duplicated'}) 
-    PercCount = pd.DataFrame(100-100*(df.isna().sum())/nb_row).T.rename(index={0:'Filling percentage'})
-    Describe = df.describe(datetime_is_numeric=True, include='all')
-    infor = pd.concat([Types,Null,Duplicated,PercCount, Describe], axis =0).T.sort_values("Filling percentage").reset_index() 
-    infor = infor.rename(columns={"index":"Variable"})
+    Types = pd.DataFrame(df.dtypes).T.rename(index={0: 'Type'})
+    Null = pd.DataFrame(df.isna().sum()).T.rename(index={0: 'null'})
+    Duplicated = pd.DataFrame(df.shape[0] - df.isna().sum() - df.nunique()).T.rename(index={0: 'Duplicated'})
+    PercCount = pd.DataFrame(100 - 100 * (df.isna().sum()) / nb_row).T.rename(index={0: 'Filling percentage'})
+    Describe = df.describe(include='all')
+    infor = pd.concat([Types, Null, Duplicated, PercCount, Describe], axis=0).T.sort_values(
+        "Filling percentage").reset_index()
+    infor = infor.rename(columns={"index": "Variable"})
     return infor
 
 
 # --------------------------------------------------------------------
 # -- DATA TYPES VISUALISATION
 # --------------------------------------------------------------------
-def visu_dataTypes (df):
+def visu_dataTypes(df):
     n_types = df['Type'].value_counts()
     values_types = n_types.values.tolist()
     blues_n = sns.color_palette(palette="Blues", n_colors=n_types.shape[0])
@@ -59,10 +57,9 @@ def visu_dataTypes (df):
 
 def get_missing_values(df_work, percentage, show_heatmap, retour=False):
     """Information about missing values
-       @param in : df_work dataframe obligatoire
+       @param : df_work dataframe, obligatory
                    percentage : boolean si True shows the number heatmap
                    show_heatmap : boolean si  shows the number heatmap
-       @param out : none
     """
 
     # 1. Total missing values
@@ -96,8 +93,8 @@ def get_missing_values(df_work, percentage, show_heatmap, retour=False):
 
     if retour:
         return table
-    
-    
+
+
 # --------------------------------------------------------------------
 # -- COLUMN FILLING VISUALIZATION
 # --------------------------------------------------------------------
@@ -106,11 +103,11 @@ def column_filling_visu(df):
 
     ax.bar(df["Variable"],
            df["Filling percentage"], color="#2994ff")
-    plt.axhline(y =100, color = 'r', linestyle = '-')
+    plt.axhline(y=100, color='r', linestyle='-')
     ax.set_ylabel("%")
     ax.set_title("Columns filling percentage")
     plt.xticks(rotation=90)
-    plt.tight_layout
+    # plt.tight_layout
     plt.show()
 
 
@@ -118,7 +115,6 @@ def column_filling_visu(df):
 # -- DESCRIPTION OF CATEGORICAL VARIABLES
 # --------------------------------------------------------------------
 def univ_cate_vari(dataframe, feature, tableau=True, graphDistsrib=True):
-
     """
      Displays the frequency table and a bar graph with the frequency
      of the words
@@ -131,14 +127,14 @@ def univ_cate_vari(dataframe, feature, tableau=True, graphDistsrib=True):
 
     if tableau:
         df = dataframe[feature].value_counts().to_frame().reset_index()
-        df = df.rename(columns={'index':feature, feature:'num_entries'})
-        df['Frequency_%'] = 100*df['num_entries']/((dataframe.shape[0]))
+        df = df.rename(columns={'index': feature, feature: 'feature_values'})
+        df['Frequency_%'] = 100 * df['count'] / (dataframe.shape[0])
         display(df.head(10).style.hide(axis="index"))
 
     if graphDistsrib:
-        plt.figure(figsize=(4,6))
+        plt.figure(figsize=(4, 6))
         df_graph = df.sort_values('Frequency_%', ascending=False).head(20)
-        sns.barplot(data= df_graph, x=feature, y='Frequency_%' , palette = "Blues")
+        sns.barplot(data=df_graph, x='feature_values', y='Frequency_%', palette="Blues")
         plt.title("Distribution of " + feature)
         plt.show()
 
@@ -154,10 +150,10 @@ def distribution_variables_plages(
     Retourne les plages des pourcentages des valeurs pour le découpage transmis
     Parameters
     ----------
-    @param IN : dataframe : DataFrame, obligatoire
+    @param : dataframe : DataFrame, obligatoire
                 variable : variable à découper obligatoire
                 liste_bins: liste des découpages facultatif int ou pintervallindex
-    @param OUT : dataframe des plages de nan
+    @returns : dataframe des plages de nan
     """
     nb_lignes = len(dataframe[variable])
     s_gpe_cut = pd.cut(
@@ -169,3 +165,41 @@ def distribution_variables_plages(
         (row * 100) / nb_lignes for row in df_cut['nb_données']]
 
     return df_cut.style.hide_index()
+
+
+# ---------------------------------------------------------------------------------
+# -- MANAGE STRONG CORRELATIONS
+# ---------------------------------------------------------------------------------
+
+def managing_correlations(df, correl_threshold=0.7):
+    """
+    Function removing features with a correlation over 0.7
+    ------------
+    @ Parameters :
+    * df : dataframe of train dataset, mandatory
+    * correl_threshold : correlation value over which features will be removed, default = 0.7
+    ------------
+    @ Return :
+    * df : dataframe of train dataset after removing strong correlations
+    * cols_corr_a_supp : list of columns to remove
+    """
+
+    # Absolute value correlation matrix to avoid having to manage
+    # positive and negative correlations separately
+    corr = df.corr().abs()
+
+    # Only the part above the diagonal is retained so that
+    # the correlations are taken into account only once (axial symmetry).
+    corr_triangle = corr.where(np.triu(np.ones(corr.shape), k=1).astype(bool))
+
+    # Variables with a Pearson coef > correl_threshold?
+    cols_corr_a_supp = [var for var in corr_triangle.columns
+                        if any(corr_triangle[var] > correl_threshold)]
+    print(f'There are {len(cols_corr_a_supp)} variables with strong correlation to be removed.\n')
+
+    # Drop variables with strong correlation
+    print(f'Original shape : {df.shape}')
+    df.drop(columns=cols_corr_a_supp, inplace=True)
+    print(f'Post correlation managing shape : {df.shape}')
+
+    return df, cols_corr_a_supp

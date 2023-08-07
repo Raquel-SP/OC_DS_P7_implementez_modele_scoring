@@ -9,35 +9,16 @@
 # ====================================================================
 
 import pickle
-# import time
 from datetime import datetime
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-# import numpy.typing as npt
 import seaborn as sns
 from IPython.display import display
 from sklearn.metrics import confusion_matrix
-# import shap
-# from math import sqrt
-# from collections import Counter
-# from sklearn.base import BaseEstimator
-# from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error, explained_variance_score, median_absolute_error
 from sklearn.metrics import recall_score, fbeta_score, precision_score, roc_auc_score, average_precision_score
 from sklearn.model_selection import cross_validate
-
-# from sklearn.dummy import DummyRegressor, DummyClassifier
-# from sklearn.linear_model import LinearRegression, Ridge, Lasso, ElasticNet
-# from sklearn.svm import SVR
-# from sklearn.neighbors import KNeighborsRegressor
-# from sklearn.tree import DecisionTreeRegressor
-# from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
-# from sklearn.inspection import permutation_importance
-# from sklearn.feature_selection import RFECV
-# from xgboost import XGBRegressor
-# from lightgbm import LGBMRegressor
-
 
 # --------------------------------------------------------------------
 # -- VERSION
@@ -50,9 +31,9 @@ __version__ = '0.0.0'
 # -----------------------------------------------------------------------
 
 def custom_score(y_real, y_pred, tn_weighting=1, fp_weighting=-1, fn_weighting=-10, tp_weighting=1):
-    '''
+    """
     Business metric designed to minimise the risk to the bank of granting a loan by penalising false negatives.
-    '''
+    """
     # tn (true negative): the loan is refunded: the bank earns money. => to maximize
     # fp (false positive) : the loan is denied in error: the bank loses interest,
     #    loses profit but does not actually lose money (type I error).
@@ -115,9 +96,9 @@ class balance_method_analysis:
                  df_results, title,
                  show_table=True, show_confusion_matrix=True,
                  file_df_result_score='', verbose=True, dump_to_pickle=False):
-        '''
-        This function is used to initialize the class members 
-        
+        """
+        This function is used to initialize the class members
+
          ------------
         @Inputs :
         ------------
@@ -136,12 +117,12 @@ class balance_method_analysis:
                 Whether to enable verbosity or not
             dump_to_pickle: bool, default = False
                 Whether to pickle the final table with model scores or not
-                
+
         ------------
         @Returns
         ------------
             None
-        '''
+        """
 
         self.model = model
         self.X_train = X_train
@@ -152,17 +133,18 @@ class balance_method_analysis:
         self.title = title
         self.show_table = show_table
         self.show_confusion_matrix = show_confusion_matrix
-        self.file_df_result_score = '/home/raquelsp/Documents/Openclassrooms/P7_implementez_modele_scoring/P7_travail/P7_scoring_credit/model_tests/df_results_scores.pkl'
+        self.file_df_result_score = '/home/raquelsp/Documents/Openclassrooms/P7_implementez_modele_scoring/P7_travail' \
+                                    '/P7_scoring_credit/model_tests/df_results_scores.pkl '
         self.verbose = verbose
         self.dump_to_pickle = dump_to_pickle
 
     def train_model(self):
-        '''
+        """
         Funtion to train and fit the model
-        
+
         Inputs: self
         Returns: None
-        '''
+        """
         if self.verbose:
             self.time_start = datetime.now()
             print('###################################################')
@@ -187,9 +169,9 @@ class balance_method_analysis:
             print(f"Time Taken to train the model = {datetime.now() - self.start}")
 
     def custom_score(self, tn_weighting=1, fp_weighting=-1, fn_weighting=-10, tp_weighting=1):
-        '''
+        """
         Business metric designed to minimise the risk to the bank of granting a loan by penalising false negatives.
-        '''
+        """
         # tn (true negative): the loan is refunded: the bank earns money. => to maximize
         # fp (false positive) : the loan is denied in error: the bank loses interest, loses profit but does not actually lose money (type I error).
         # fn (false negative) : the loan is approved but the customer defaulting: the bank loses money (type II error). => to minimise 
@@ -228,12 +210,12 @@ class balance_method_analysis:
         return custom_score
 
     def compute_metrics(self):
-        '''
-        Funtion to compute model scores
-        
-        Inputs: self      
+        """
+        Function to compute model scores
+
+        Inputs: self
         Returns: None
-        '''
+        """
 
         # Probabilities
         y_proba = model.predict_proba(self.X_val)[:, 1]
@@ -298,15 +280,15 @@ class balance_method_analysis:
         plt.show()
 
     def main(self):
-        '''
+        """
         Function to be called for analyze the data balance method that improves scores the most.
-        
+
         Inputs:
             self
-            
+
         Returns:
             Table with the model results scores.
-        '''
+        """
 
         # Fit and predict
         self.train_model()
@@ -501,7 +483,7 @@ def process_classif_thresh(model, threshold_, X_train, X_val, y_train,
         plt.show()
 
     # Performances saving
-    df_results_thresh = df_results_thresh.append(pd.DataFrame({
+    df_results_thresh = pd.concat([df_results_thresh, (pd.DataFrame({
         'Experience': [title],
         'Recall': [recall],
         'Precision': [precision],
@@ -530,7 +512,7 @@ def process_classif_thresh(model, threshold_, X_train, X_val, y_train,
         'Train_precision_CV +/-': [scores['train_precision'].std()],
         'Test_precision_CV': [scores['test_precision'].mean()],
         'Test_precision_CV +/-': [scores['test_precision'].std()],
-        }), ignore_index=True)
+    }))], axis =0)
 
 
     # Saving results dataframe
