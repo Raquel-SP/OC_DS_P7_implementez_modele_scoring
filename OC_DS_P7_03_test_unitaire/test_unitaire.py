@@ -4,7 +4,7 @@ import pytest
 import pickle
 import os
 
-import tools_dataframe
+from tools_dataframe import managing_correlations
 
 # Get the path where the data and model files are stored
 path = os.path.dirname(os.path.realpath(__file__))
@@ -111,7 +111,7 @@ def nonDefaulter():
 def test_managing_correlations(uncorrelated_columns, correlated_columns):
     correl_threshold = 0.7
     cols_corr_a_supp = []
-    correlated_columns, cols_corr_a_supp = tools_dataframe.managing_correlations(correlated_columns)
+    correlated_columns, cols_corr_a_supp = managing_correlations(correlated_columns)
 
     assert correlated_columns.shape == uncorrelated_columns.shape
 
