@@ -153,7 +153,7 @@ with header:
     st.markdown("<style>body{background-color: #F5F5F5; }</style>", unsafe_allow_html=True)
     
     main_header = '<b><p style="font-family:sans-serif; color:#2994ff; text-align: center; font-size: 42px;">Prêt à dépenser</p></b>'
-    sub_header = '<b><p style="font-family:sans-serif; text-align: center; font-size: 20px;">Présentation du scoring client et interprétation du score attribué.</p></b>'
+    sub_header = '<b><p style="font-family:sans-serif; text-align: center; font-size: 20px;">Présentation du scoring client et explication du score attribué.</p></b>'
     st.markdown(main_header, unsafe_allow_html=True)
     st.markdown(sub_header, unsafe_allow_html=True)
     st.text("""
