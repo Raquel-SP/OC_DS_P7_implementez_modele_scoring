@@ -9,7 +9,7 @@ import tools_dataframe
 # Get the path where the data and model files are stored
 path = os.path.dirname(os.path.realpath(__file__))
 # getting our trained model from a file we created earlier
-model = pickle.load(open(path + "/model_tests/lgbm_best_model.pkl", "rb"))
+model = pickle.load(open(path + "/lgbm_best_model.pkl", "rb"))
 
 
 @pytest.fixture()
