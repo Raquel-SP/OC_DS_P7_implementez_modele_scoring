@@ -24,11 +24,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          - python -m pip install pytest .
-          - python -m pip install pandas
-          - python -m pip install numpy
-          - python -m pip install pickle
-          - python -m pip install os
+          - python -m pip install pytest . pandas numpy pickle os
 
       - name: Run tests
         run: pytest
