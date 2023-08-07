@@ -1,8 +1,6 @@
 name: pipeline_tests
 
-on:
-  push:
-  pull_resquest:
+on: push
 
 jobs:
   run-tests:
