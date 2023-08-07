@@ -32,7 +32,7 @@ jobs:
       - name : Install personal modules
         run : |
           cd $GITHUB_WORKSPACE
-          python -c 'OC_DS_P7_01_modeling/tools_dataframe.py'
+          python -c './OC_DS_P7_01_modeling/tools_dataframe.py'
 
       - name: Run tests
         run: pytest
