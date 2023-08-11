@@ -133,7 +133,7 @@ class balance_method_analysis:
         self.title = title
         self.show_table = show_table
         self.show_confusion_matrix = show_confusion_matrix
-        self.file_df_result_score = '/home/raquelsp/Documents/Openclassrooms/P7_implementez_modele_scoring/P7_travail' \
+        self.file_df_result_score = '/home/raquelsp/Documents/Openclassrooms/Openclassrooms/P7_implementez_modele_scoring/P7_travail' \
                                     '/P7_scoring_credit/model_tests/df_results_scores.pkl '
         self.verbose = verbose
         self.dump_to_pickle = dump_to_pickle
@@ -516,8 +516,7 @@ def process_classif_thresh(model, threshold_, X_train, X_val, y_train,
 
 
     # Saving results dataframe
-    path_df_results = '/home/raquelsp/Documents/Openclassrooms/P7_implementez_modele_scoring/P7_travail' \
-                          '/P7_scoring_credit/model_tests/df_results_thresh.pkl '
+    path_df_results = '/home/raquelsp/Documents/Openclassrooms/P7_implementez_modele_scoring/P7_travail/P7_scoring_credit/model_tests/df_results_thresh.pkl'
     with open(path_df_results, 'wb') as f:
         pickle.dump(df_results_thresh, f, pickle.HIGHEST_PROTOCOL)
 
