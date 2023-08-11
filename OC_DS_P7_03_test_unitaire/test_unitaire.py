@@ -4,8 +4,6 @@ import pytest
 import pickle
 import os
 
-#from tools_dataframe import managing_correlations
-
 # Get the path where the data and model files are stored
 path = os.path.dirname(os.path.realpath(__file__))
 # getting our trained model from a file we created earlier
@@ -110,14 +108,11 @@ def nonDefaulter():
 
 def test_managing_correlations(uncorrelated_columns, correlated_columns):
     correl_threshold = 0.7
-    #cols_corr_a_supp = []
     corr = correlated_columns.corr().abs()
     corr_triangle = corr.where(np.triu(np.ones(corr.shape), k=1).astype(bool))
     cols_corr_a_supp = [var for var in corr_triangle.columns
                         if any(corr_triangle[var] > correl_threshold)]
     correlated_columns.drop(columns=cols_corr_a_supp, inplace=True)
-
-    #correlated_columns, cols_corr_a_supp = managing_correlations(correlated_columns)
 
     assert correlated_columns.shape == uncorrelated_columns.shape
 
@@ -128,8 +123,8 @@ def test_classif_defaulters(defaulter):
     credit_score = round(proba[0], 2)
 
     # Whether the credit is denied or not
-    opti_proba_threshold = 0.65  # Probability threshold optimised during modeling
-    prediction = np.where(credit_score >= (opti_proba_threshold * 100),
+    proba_threshold = 0.5
+    prediction = np.where(credit_score >= (proba_threshold * 100),
                           'Defaulter', 'Non_defaulter')
     assert prediction == 'Defaulter'
 
@@ -140,7 +135,7 @@ def test_classif_nonDefaulters(nonDefaulter):
     credit_score = round(proba[0], 2)
 
     # Whether the credit is denied or not
-    opti_proba_threshold = 0.65  # Probability threshold optimised during modeling
-    prediction = np.where(credit_score >= (opti_proba_threshold * 100),
+    proba_threshold = 0.5
+    prediction = np.where(credit_score >= (proba_threshold * 100),
                           'Defaulter', 'Non_defaulter')
     assert prediction == 'Non_defaulter'
