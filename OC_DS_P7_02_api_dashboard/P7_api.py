@@ -67,13 +67,14 @@ application_train = pd.read_csv(path + "/application_train.csv")
 application_train_val = application_train[application_train["SK_ID_CURR"].isin(clients_val)]
 # General client information
 client_info_columns = ['SK_ID_CURR',
+                       'TARGET',
                        'DAYS_BIRTH', 'CODE_GENDER',
                        'NAME_FAMILY_STATUS',
                        'CNT_CHILDREN', 'NAME_EDUCATION_TYPE',
                        'NAME_INCOME_TYPE', 'DAYS_EMPLOYED',
                        'AMT_INCOME_TOTAL',
                        'NAME_CONTRACT_TYPE',
-                        'AMT_GOODS_PRICE',
+                       'AMT_GOODS_PRICE',
                        'NAME_HOUSING_TYPE',]
 general_info = application_train_val[client_info_columns]
 # Change age features to years (instead of days)
@@ -116,8 +117,8 @@ def client_data(client_id):
     client_modeliced['credit_score']=round(client_modeliced['proba'], 2)
     
     # Whether the credit is denied or not
-    opti_proba_threshold = 0.65 # Probability threshold optimised during modeling
-    client_modeliced['prediction'] = np.where(client_modeliced['credit_score']>=(opti_proba_threshold*100), 'Credit denied', 'Credit approuved')
+    proba_threshold = 0.5
+    client_modeliced['prediction'] = np.where(client_modeliced['credit_score']>=(proba_threshold*100), 'Credit denied', 'Credit approuved')
 
     # calculate features importance in this prediction
     X_val_sub_shap = X_val_sub.drop(columns="SK_ID_CURR")
