@@ -127,14 +127,14 @@ def univ_cate_vari(dataframe, feature, tableau=True, graphDistsrib=True):
 
     if tableau:
         df = dataframe[feature].value_counts().to_frame().reset_index()
-        df = df.rename(columns={'index': feature, feature: 'feature_values'})
+        df = df.rename(columns={'index': feature, feature: 'count'})
         df['Frequency_%'] = 100 * df['count'] / (dataframe.shape[0])
         display(df.head(10).style.hide(axis="index"))
 
     if graphDistsrib:
         plt.figure(figsize=(4, 6))
         df_graph = df.sort_values('Frequency_%', ascending=False).head(20)
-        sns.barplot(data=df_graph, x='feature_values', y='Frequency_%', palette="Blues")
+        sns.barplot(data=df_graph, x=feature, y='Frequency_%', palette="Blues")
         plt.title("Distribution of " + feature)
         plt.show()
 
