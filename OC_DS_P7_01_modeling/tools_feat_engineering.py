@@ -70,10 +70,8 @@ class feat_eng_application_train_test:
         self.dump_to_pickle = dump_to_pickle
         self.file_directory = "../P7_scoring_credit/preprocessing/"
         self.file_directory_temp = "../P7_scoring_credit/preprocessing/temp/"
-        self.path_sav_appltrain_wonan = "/home/raquelsp/Documents/Openclassrooms/P7_implementez_modele_scoring" \
-                                        "/P7_travail/P7_scoring_credit/preprocessing/application_train_wo_nan.pkl"
-        self.path_sav_appltest_wonan = "/home/raquelsp/Documents/Openclassrooms/P7_implementez_modele_scoring" \
-                                       "/P7_travail/P7_scoring_credit/preprocessing/application_test_wo_nan.pkl"
+        self.path_sav_appltrain_wonan = "../P7_scoring_credit/preprocessing/application_train_wo_nan.pkl"
+        self.path_sav_appltest_wonan = "../P7_scoring_credit/preprocessing/application_test_wo_nan.pkl"
 
     def load_dataframes(self):
         """
@@ -2095,6 +2093,19 @@ def create_new_features(data):
     Returns:
         None
     """
+    
+    path_prev_app_ML = "../P7_scoring_credit/preprocessing/previous_application_ML.pkl"
+    with open(path_prev_app_ML, 'rb') as f:
+        previous_application_ML = pickle.load(f)
+    path_cc_balance_ML = "../P7_scoring_credit/preprocessing/cc_balance_ML.pkl"
+    with open(path_cc_balance_ML, 'rb') as f:
+        cc_balance_ML = pickle.load(f)
+    path_isnt_pay_ML = "../P7_scoring_credit/preprocessing/installments_payments_ML.pkl"
+    with open(path_isnt_pay_ML, 'rb') as f:
+        installments_payments_ML = pickle.load(f)
+    path_bureau_ML = "../P7_scoring_credit/preprocessing/bureau_ML.pkl"
+    with open(path_bureau_ML, 'rb') as f:
+        bureau_ML = pickle.load(f)
 
     # previous applications columns
     prev_annuity_columns = [ele for ele in previous_application_ML.columns if 'AMT_ANNUITY' in ele]
