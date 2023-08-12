@@ -39,13 +39,10 @@ model = pickle.load(open(path + "/lgbm_best_model.pkl", "rb"))
 #------------------#
 # Data for credit score computing
 X_val = pd.read_csv(path + "/X_val.csv")
-y_val = pd.read_csv(path + "/y_val.csv")
 
 # Create a subsample
-target = y_val["TARGET"]
-data_copmute = pd.concat((X_val, target), axis=1)
-X_val_0 = data_copmute[data_copmute["TARGET"] == 0].sample(100, random_state=84)
-X_val_1 = data_copmute[data_copmute["TARGET"] == 1].sample(100, random_state=84)
+X_val_0 = X_val[X_val["TARGET"] == 0].sample(100, random_state=84)
+X_val_1 = X_val[X_val["TARGET"] == 1].sample(100, random_state=84)
 X_val_sub = pd.concat([X_val_0, X_val_1]).reset_index(drop=True)
 X_val_sub = X_val_sub.drop(columns=["TARGET"])
 
@@ -55,16 +52,12 @@ clients_val = X_val_sub['SK_ID_CURR'].tolist() # Get the list of clients in X_va
 #Data post-feature engineering before standardisation
 final_train_data = pickle.load(open(path + "/final_train_data.pkl", "rb"))
     
-# Get information for clients in X_val
-train_data_modeling_val = final_train_data[final_train_data["SK_ID_CURR"].isin(clients_val)]
 # Reduce information to features used for modeling
-train_data_modeling_val = train_data_modeling_val[columns_val]
+train_data_modeling_val = final_train_data[columns_val]
 
 # Get original application_train dataset for extract general information
 application_train = pd.read_csv(path + "/application_train.csv")
 
-# Get information for clients in X_val
-application_train_val = application_train[application_train["SK_ID_CURR"].isin(clients_val)]
 # General client information
 client_info_columns = ['SK_ID_CURR',
                        'TARGET',
@@ -76,7 +69,7 @@ client_info_columns = ['SK_ID_CURR',
                        'NAME_CONTRACT_TYPE',
                        'AMT_GOODS_PRICE',
                        'NAME_HOUSING_TYPE',]
-general_info = application_train_val[client_info_columns]
+general_info = application_train[client_info_columns]
 # Change age features to years (instead of days)
 # Transform DAYS_BIRTH to years
 general_info['AGE'] = np.trunc(np.abs(general_info['DAYS_BIRTH']  / 365)).astype('int8')
