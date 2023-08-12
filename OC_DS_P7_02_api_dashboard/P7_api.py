@@ -10,7 +10,7 @@ import shap
 import os
 
 # Initializing the API
-app = flask.Flask(__name__)
+application = app = flask.Flask(__name__)
 app.config["DEBUG"] = True
 
 # Get the path where the data and model files are stored
