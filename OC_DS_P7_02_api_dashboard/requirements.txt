@@ -1,7 +1,7 @@
-Python==3.11
+python==3.10.12
 pandas==1.5.0
 numpy==1.23.3
-Flask==2.2.2
+flask==2.2.2
 imbalanced-learn==0.11.0
 shap==0.42.1
 lightgbm==4.0.0
