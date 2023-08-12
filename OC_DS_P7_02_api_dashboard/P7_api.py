@@ -38,7 +38,7 @@ model = pickle.load(open(path + "/lgbm_best_model.pkl", "rb"))
 # getting the data #
 #------------------#
 # Data for credit score computing
-X_val = pd.read_csv(path + "/X_val.csv", index_col=0)
+X_val = pd.read_csv(path + "/X_val.csv")
 
 # Create a subsample
 X_val_0 = X_val[X_val["TARGET"] == 0].sample(100, random_state=84)
@@ -51,6 +51,7 @@ clients_val = X_val_sub['SK_ID_CURR'].tolist() # Get the list of clients in X_va
 
 #Data post-feature engineering before standardisation
 final_train_data = pickle.load(open(path + "/final_train_data.pkl", "rb"))
+final_train_data = final_train_data[final_train_data["SK_ID_CURR"].isin(clients_val)]
     
 # Reduce information to features used for modeling
 train_data_modeling_val = final_train_data[columns_val]
