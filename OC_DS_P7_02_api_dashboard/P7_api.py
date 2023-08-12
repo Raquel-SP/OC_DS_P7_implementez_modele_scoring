@@ -38,7 +38,7 @@ model = pickle.load(open(path + "/lgbm_best_model.pkl", "rb"))
 # getting the data #
 #------------------#
 # Data for credit score computing
-X_val = pd.read_csv(path + "/X_val.csv")
+X_val = pd.read_csv(path + "/X_val.csv", index_col=0)
 
 # Create a subsample
 X_val_0 = X_val[X_val["TARGET"] == 0].sample(100, random_state=84)
