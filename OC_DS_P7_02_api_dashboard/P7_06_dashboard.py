@@ -12,7 +12,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.lines as mlines
 import seaborn as sns
-from PIL import Image
+#from PIL import Image
 import shap
 import plotly.graph_objects as go
 
@@ -149,7 +149,7 @@ for col in data_ref.columns:
 #                     IMAGES                     #
 ##################################################
 # Logo
-logo =  Image.open("/home/raquelsp/Documents/Openclassrooms/P7_implementez_modele_scoring/P7_travail/P7_scoring_credit/OC_DS_P7_01_modeling/img/logo_projet.png") 
+# logo =  Image.open("/home/raquelsp/Documents/Openclassrooms/P7_implementez_modele_scoring/P7_travail/P7_scoring_credit/OC_DS_P7_01_modeling/img/logo_projet.png") 
 
 
 #################################################
@@ -205,8 +205,8 @@ with header:
 #                    Sidebar                    #
 #===============================================#
 
-st.sidebar.image(logo, width=240, caption=" Dashboard - Aide à la décision",
-                 use_column_width='always')
+#st.sidebar.image(logo, width=240, caption=" Dashboard - Aide à la décision",
+                 #use_column_width='always')
 
 
 #===============================================#
