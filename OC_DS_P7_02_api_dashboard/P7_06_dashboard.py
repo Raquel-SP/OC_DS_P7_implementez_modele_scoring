@@ -12,7 +12,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.lines as mlines
 import seaborn as sns
-#from PIL import Image
+from PIL import Image
 import shap
 import plotly.graph_objects as go
 
@@ -29,7 +29,7 @@ st.set_page_config(page_title = "Prêt à dépenser - Scoring Crédit", layout="
 # local :
 # API_url = "http://127.0.0.1:8000/"
 # online :
-API_url = "http://13.37.220.227/"
+API_url = "http://13.37.97.118/"
 # Initialize javascript for shap plots
 shap.initjs()
 
@@ -64,9 +64,6 @@ def remote_css(url):
 
 def icon(icon_name):
     st.markdown(f'<i class="material-icons">{icon_name}</i>', unsafe_allow_html=True)
-
-#local_css("style.css")
-#remote_css('https://fonts.googleapis.com/icon?family=Material+Icons')
 
 
 # Deleting default margins
@@ -149,7 +146,7 @@ for col in data_ref.columns:
 #                     IMAGES                     #
 ##################################################
 # Logo
-# logo =  Image.open("/home/raquelsp/Documents/Openclassrooms/P7_implementez_modele_scoring/P7_travail/P7_scoring_credit/OC_DS_P7_01_modeling/img/logo_projet.png") 
+logo =  Image.open('https://user.oc-static.com/upload/2019/02/25/15510866018677_logo%20projet%20fintech.png') 
 
 
 #################################################
@@ -160,11 +157,6 @@ for col in data_ref.columns:
 def st_shap(plot, height=None):
     shap_html = f"<head>{shap.getjs()}</head><body>{plot.html()}</body>"
     components.html(shap_html, height=height)
-
-
-
-
-
 
 
 #################################################
@@ -205,8 +197,8 @@ with header:
 #                    Sidebar                    #
 #===============================================#
 
-#st.sidebar.image(logo, width=240, caption=" Dashboard - Aide à la décision",
-                 #use_column_width='always')
+st.sidebar.image(logo, width=240, caption=" Dashboard - Aide à la décision",
+                 use_column_width='always')
 
 
 #===============================================#
@@ -538,4 +530,3 @@ with distrib_def_nondef :
                 ax.set_title('Distribution de défaillants/non-défaillants par catégorie',pad=20, fontdict={'fontsize':8})
                 
                 st.pyplot(use_container_width=False)
-                            
