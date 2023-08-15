@@ -12,7 +12,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.lines as mlines
 import seaborn as sns
-from PIL import Image
+# from PIL import Image
 import shap
 import plotly.graph_objects as go
 
@@ -29,7 +29,7 @@ st.set_page_config(page_title = "Prêt à dépenser - Scoring Crédit", layout="
 # local :
 # API_url = "http://127.0.0.1:8000/"
 # online :
-API_url = "http://13.37.97.118/"
+API_url = "http://13.37.212.213/"
 # Initialize javascript for shap plots
 shap.initjs()
 
@@ -146,7 +146,7 @@ for col in data_ref.columns:
 #                     IMAGES                     #
 ##################################################
 # Logo
-logo =  Image.open('https://user.oc-static.com/upload/2019/02/25/15510866018677_logo%20projet%20fintech.png') 
+# logo =  Image.open('https://user.oc-static.com/upload/2019/02/25/15510866018677_logo%20projet%20fintech.png') 
 
 
 #################################################
@@ -197,8 +197,8 @@ with header:
 #                    Sidebar                    #
 #===============================================#
 
-st.sidebar.image(logo, width=240, caption=" Dashboard - Aide à la décision",
-                 use_column_width='always')
+#st.sidebar.image(logo, width=240, caption=" Dashboard - Aide à la décision",
+                # use_column_width='always')
 
 
 #===============================================#
