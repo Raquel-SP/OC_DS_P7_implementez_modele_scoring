@@ -7,6 +7,7 @@ import streamlit as st
 import streamlit.components.v1 as components
 from urllib.request import urlopen
 import json
+import request
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -29,7 +30,8 @@ st.set_page_config(page_title = "Prêt à dépenser - Scoring Crédit", layout="
 # local :
 # API_url = "http://127.0.0.1:8000/"
 # online :
-API_url = "http://13.37.97.118/" # elastic IP
+# API_url = "http://13.37.97.118/" # elastic IP
+API_url = request.get("http://13.37.97.118/") # elastic IP
 # Initialize javascript for shap plots
 shap.initjs()
 
