@@ -7,7 +7,7 @@ import streamlit as st
 import streamlit.components.v1 as components
 from urllib.request import urlopen
 import json
-import requests
+#import requests
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -42,17 +42,17 @@ shap.initjs()
 # Get all the clients data through an API
 
 # Data used for computing probability
-json_url_API = requests.get(API_url + "dataAPI")
-API_data_all = json.loads(json_url_API.content)
-#json_url_API = urlopen(API_url + "dataAPI")
-#API_data_all = json.loads(json_url_API.read())
+#json_url_API = requests.get(API_url + "dataAPI")
+#API_data_all = json.loads(json_url_API.content)
+json_url_API = urlopen(API_url + "dataAPI")
+API_data_all = json.loads(json_url_API.read())
 API_data_all = pd.DataFrame(API_data_all)
 
 # General and non standardized Data
-json_url_Gene = requests.get(API_url + "dataGeneral")
-general_data_all = json.loads(json_url_Gene.content)
-#json_url_Gene = urlopen(API_url + "dataGeneral")
-#general_data_all = json.loads(json_url_Gene.read())
+#json_url_Gene = requests.get(API_url + "dataGeneral")
+#general_data_all = json.loads(json_url_Gene.content)
+json_url_Gene = urlopen(API_url + "dataGeneral")
+general_data_all = json.loads(json_url_Gene.read())
 general_data_all = pd.DataFrame(general_data_all)
 
 
