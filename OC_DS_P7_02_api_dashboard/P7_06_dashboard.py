@@ -146,7 +146,7 @@ for col in data_ref.columns:
 #                     IMAGES                     #
 ##################################################
 # Logo
-logo =  Image.open('https://user.oc-static.com/upload/2019/02/25/15510866018677_logo%20projet%20fintech.png') 
+logo =  Image.open('logo_projet.png') 
 
 
 #################################################
