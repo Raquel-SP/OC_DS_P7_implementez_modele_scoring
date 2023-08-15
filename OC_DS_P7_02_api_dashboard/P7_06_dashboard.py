@@ -29,7 +29,7 @@ st.set_page_config(page_title = "Prêt à dépenser - Scoring Crédit", layout="
 # local :
 # API_url = "http://127.0.0.1:8000/"
 # online :
-API_url = "http://13.37.212.213/"
+API_url = "http://13.37.97.118/" # elastic IP
 # Initialize javascript for shap plots
 shap.initjs()
 
