@@ -30,8 +30,8 @@ st.set_page_config(page_title = "Prêt à dépenser - Scoring Crédit", layout="
 # local :
 # API_url = "http://127.0.0.1:8000/"
 # online :
-# API_url = "http://13.37.97.118/" # elastic IP
-API_url = requests.get("http://13.37.97.118/") # elastic IP
+API_url = "http://13.37.97.118/" # elastic IP
+# API_url = requests.get("http://13.37.97.118/") # elastic IP
 # Initialize javascript for shap plots
 shap.initjs()
 
@@ -42,13 +42,17 @@ shap.initjs()
 # Get all the clients data through an API
 
 # Data used for computing probability
-json_url_API = urlopen(API_url + "dataAPI")
-API_data_all = json.loads(json_url_API.read())
+json_url_API = requests.get(API_url + "dataAPI")
+API_data_all = json.loads(json_url_API.content)
+#json_url_API = urlopen(API_url + "dataAPI")
+#API_data_all = json.loads(json_url_API.read())
 API_data_all = pd.DataFrame(API_data_all)
 
 # General and non standardized Data
-json_url_Gene = urlopen(API_url + "dataGeneral")
-general_data_all = json.loads(json_url_Gene.read())
+json_url_Gene = requests.get(API_url + "dataGeneral")
+general_data_all = json.loads(json_url_Gene.content)
+#json_url_Gene = urlopen(API_url + "dataGeneral")
+#general_data_all = json.loads(json_url_Gene.read())
 general_data_all = pd.DataFrame(general_data_all)
 
 
