@@ -27,7 +27,7 @@ st.set_page_config(page_title = "Prêt à dépenser - Scoring Crédit", layout="
 #               API configuration               #
 #################################################
 # local :
-# API_url = "http://127.0.0.1:8000/"
+# API_url = "http://127.0.0.1:5000/"
 # online :
 API_url = "http://13.37.97.118/" # elastic IP
 # Initialize javascript for shap plots
@@ -167,7 +167,6 @@ header = st.container()
 select_client = st.container()
 client_info = st.container()
 scoring_info = st.container()
-main_feat = st.container()
 plus_client_info = st.container()
 distrib_def_nondef = st.container()
 
@@ -279,6 +278,11 @@ with scoring_info:
     col1, col2 = st.columns([1, 1])
     with col1:
         st.header("Score du client")
+        
+        if df_client_api["prediction"][0]=="Credit denied":
+            st.error("Risque élevé")
+        else:
+            st.success("Risque faible")
     
         fig = go.Figure(go.Indicator(
             mode = 'gauge+number+delta',
@@ -308,56 +312,38 @@ with scoring_info:
                           font={'color': 'darkblue', 'family': 'Arial'})
         st.plotly_chart(fig)
         with col2:
-            if df_client_api["prediction"][0]=="Credit denied":
-                st.error("Risque élevé")
-            else:
-                st.success("Risque faible")
-
-
-#===============================================#
-#     Main features, local interpretability     #
-#===============================================#
-
-with main_feat:
-    st.divider()
-    st.header("Variables ayant le plus d'impact sur le score du client")
-    
-    # List the columns we don't need for the explanation
-    columns_info = ["SK_ID_CURR", "proba", "credit_score", "prediction", "expected"]
-    # Store the columns names to use them in the shap plots
-    client_data = df_client_api.drop(columns = columns_info).iloc[0:1,:]
-    features_analysis = client_data.columns
-    
-    # store the data we want to explain in the shap plots
-    data_explain = np.asarray(client_data)
-    shap_values = df_client_api.drop(columns = columns_info).iloc[1,:].values
-    expected_value = df_client_api["expected"].tolist()[0]
-    
-    
-    # display a shap force plot
-    fig_force = shap.force_plot(base_value = expected_value,
-                                shap_values = shap_values,
-                                features = data_explain,
-                                feature_names = features_analysis) 
-    st_shap(fig_force)
-    
-    
-    # in an expander, display the client's data and comparison with average
-    with st.expander("Ouvrir pour afficher l'analyse détaillée des variables avec le plus d'influence"):
-        col1, col2 = st.columns([1, 1])
-        with col1:
-            # display a shap waterfall plot
-            fig_water = shap.plots._waterfall.waterfall_legacy(expected_value,
+            st.subheader("Variables ayant le plus d'impact sur le score du client")
+            
+            # List the columns we don't need for the explanation
+            columns_info = ["SK_ID_CURR", "proba", "credit_score", "prediction", "expected"]
+            # Store the columns names to use them in the shap plots
+            client_data = df_client_api.drop(columns = columns_info).iloc[0:1,:]
+            features_analysis = client_data.columns
+            
+            # store the data we want to explain in the shap plots
+            data_explain = np.asarray(client_data)
+            shap_values = df_client_api.drop(columns = columns_info).iloc[1,:].values
+            expected_value = df_client_api["expected"].tolist()[0]
+            
+            
+            # display a shap force plot
+            fig_force = shap.force_plot(base_value = expected_value,
                                         shap_values = shap_values,
+                                        features = data_explain,
                                         feature_names = features_analysis) 
-            st.pyplot(fig_water, use_container_width=True)
-        with col2:
-            # display a shap decision plot
-            fig_decision = shap.decision_plot(
-                expected_value, 
-                shap_values,
-                features_analysis)
-            st.pyplot(fig_decision, use_container_width=True)
+            st_shap(fig_force)
+            
+            
+            # in an expander, display the client's data and comparison with average
+            with st.expander("Ouvrir pour afficher l'analyse détaillée des variables avec le plus d'influence"):
+                # display a shap waterfall plot
+                fig_water = shap.plots._waterfall.waterfall_legacy(expected_value,
+                                                shap_values = shap_values,
+                                                feature_names = features_analysis) 
+                st.pyplot(fig_water, use_container_width=True)
+
+
+
 
 #===============================================#
 #          Detailed information client          #
@@ -495,38 +481,36 @@ with distrib_def_nondef :
                       height: 40px;">
                       <h3 class="card-title" style="background-color:#DEC7CB; color:Crimson;
                           font-family:Georgia; text-align: center; padding: 0px 0;">
-                          Distribution des variables générale/pour les défaillants
+                          Distribution de défaillants/non-défaillants par catégorie
                       </h3>
                 </div>
             </div>
             """
         st.markdown(html_facteurs_influence, unsafe_allow_html=True)
-        with st.expander('Distribution des variables',
-                              expanded=True):
-            choix = st.selectbox("Choisir une variable : ", columns_nonSca)
+        choix = st.selectbox("Choisir une variable : ", columns_nonSca)
             
-            if choix not in categories :
-                plt.figure(figsize=(5, 3))
-                sns.set_style('whitegrid')
-                sns.distplot(general_data_all[choix][general_data_all['TARGET'] == 0].dropna(),
+        if choix not in categories :
+            plt.figure(figsize=(5, 3))
+            sns.set_style('whitegrid')
+            sns.distplot(general_data_all[choix][general_data_all['TARGET'] == 0].dropna(),
                          label='Non-Défaillants', hist=False, color='red')
-                sns.distplot(general_data_all[choix][general_data_all['TARGET'] == 1].dropna(),
+            sns.distplot(general_data_all[choix][general_data_all['TARGET'] == 1].dropna(),
                              label='Défaillants', hist=False, color='black')
-                plt.xlabel(choix)
-                plt.ylabel('Probability Density')
-                plt.legend(fontsize='xx-small')
-                plt.title("Dist-Plot of {}".format(choix))
-                st.pyplot(use_container_width=False)
+            plt.xlabel(choix)
+            plt.ylabel('Probability Density')
+            plt.legend(fontsize='xx-small')
+            plt.title("Dist-Plot of {}".format(choix))
+            st.pyplot(use_container_width=False)
                 
-            if choix in categories :
-                distrib = ["TARGET", choix]
-                df_plot_cat = pd.DataFrame(general_data_all[distrib].value_counts()).reset_index()
-                df_plot_cat_pivot = df_plot_cat.pivot(index=choix, columns='TARGET', values=0)
-                df_plot_cat_pivot.reset_index(inplace=True)
-                df_plot_cat_pivot.columns = [choix, "Non défaillants", "Défaillants"]
-                ax=df_plot_cat_pivot.plot(x=choix, kind='bar', stacked=True,
+        if choix in categories :
+            distrib = ["TARGET", choix]
+            df_plot_cat = pd.DataFrame(general_data_all[distrib].value_counts()).reset_index()
+            df_plot_cat_pivot = df_plot_cat.pivot(index=choix, columns='TARGET', values=0)
+            df_plot_cat_pivot.reset_index(inplace=True)
+            df_plot_cat_pivot.columns = [choix, "Non défaillants", "Défaillants"]
+            ax=df_plot_cat_pivot.plot(x=choix, kind='bar', stacked=True,
                         figsize=(4, 3), fontsize=6, rot=45)
-                ax.set_xlabel(None)
-                ax.set_title('Distribution de défaillants/non-défaillants par catégorie',pad=20, fontdict={'fontsize':8})
+            ax.set_xlabel(None)
+            ax.set_title('Distribution de défaillants/non-défaillants par catégorie',pad=20, fontdict={'fontsize':8})
                 
-                st.pyplot(use_container_width=False)
+            st.pyplot(use_container_width=False)
