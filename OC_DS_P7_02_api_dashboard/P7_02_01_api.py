@@ -51,7 +51,7 @@ clients_val = X_val_sub['SK_ID_CURR'].tolist() # Get the list of clients in X_va
 
 #Data post-feature engineering before standardisation
 final_train_data = pickle.load(open(path + "/resources/final_train_data.pkl", "rb"))
-final_train_data = final_train_data[final_train_data["SK_ID_CURR"].isin(clients_val)]
+# final_train_data = final_train_data[final_train_data["SK_ID_CURR"].isin(clients_val)]
     
 # Reduce information to features used for modeling
 train_data_modeling_val = final_train_data[columns_val]
