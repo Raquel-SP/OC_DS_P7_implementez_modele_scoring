@@ -280,9 +280,9 @@ with scoring_info:
         st.header("Score du client")
         
         if df_client_api["prediction"][0]=="Credit denied":
-            st.error("Risque élevé")
+            st.error("Crédit refusé")
         else:
-            st.success("Risque faible")
+            st.success("Crédit accordé")
     
         fig = go.Figure(go.Indicator(
             mode = 'gauge+number+delta',
