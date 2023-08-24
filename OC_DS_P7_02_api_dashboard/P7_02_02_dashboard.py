@@ -103,7 +103,7 @@ df_econo_client_info = general_data_all[client_econom_info]
 
 
 # Create the list of clients
-client_list = general_data_all["SK_ID_CURR"].tolist()
+client_list = API_data_all["SK_ID_CURR"].tolist()
 
 # Create the list of columns non Scaled
 columns_nonSca = list(general_data_all.drop(columns=["SK_ID_CURR", "TARGET"]).columns)
